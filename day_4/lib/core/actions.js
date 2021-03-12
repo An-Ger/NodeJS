@@ -1,29 +1,30 @@
 const { promisify } = require("util");
 const path = require("path");
 
-const download = promisify(require("download-git-repo"));
+const downloadRepo = promisify(require('download-git-repo'));
 const open = require("open");
 
-const { reactRepo } = require("../config/repo-config");
-const { commandSpawn } = require("../utils/terminal");
+const repoConfig = require("../config/repo-config");
+const log = require('../utils/log');
+const terminal = require("../utils/terminal");
 const { compile, writeToFile, createDirSync } = require("../utils/utils");
 
 // callback -> promisify(函数) -> Promise -> async await
 const createProjectAction = async (project) => {
-  console.log("yorn-cli helps you create your project");
+  // 1.提示信息
+  log.hint('yorn-cli helps you create your project, please wait a moment~');
 
-  // 1.clone项目
-  await download(reactRepo, project, { clone: true });
+  // 2.clone项目从仓库
+  await downloadRepo(repoConfig.reactGitRepo, project, { clone: true });
 
-  // 2.执行npm install
-  const command = process.platform === "win32" ? "npm.cmd" : "npm";
-  await commandSpawn(command, ["install"], { cwd: `./${project}` });
-
-  // 3.运行npm run serve
-  commandSpawn(command, ["run", "serve"], { cwd: `./${project}` });
-
+  // 3.执行npm install
+  const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+  await terminal.spawn(npm, ['install'], { cwd: `./${project}` });
   // 4.打开浏览器
   open("http://localhost:3000/");
+  // 5.运行npm run serve
+  await terminal.spawn(npm, ['run', 'serve'], { cwd: `./${project}` });
+
 };
 
 // 添加组件的action

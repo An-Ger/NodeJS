@@ -1,17 +1,32 @@
-/*
- *终端命令行代码
- */
-const { spawn } = require("child_process");
-const commandSpawn = (...args) => {
-  return new Promise((resolve, reject) => {
+const { spawn, exec } = require('child_process');
+
+
+const spawnCommand = (...args) => {
+  return new Promise((resole, reject) => {
     const childProcess = spawn(...args);
     childProcess.stdout.pipe(process.stdout);
-    childProcess.stdout.pipe(process.stderr);
-    childProcess.on("close", () => {
+    childProcess.stderr.pipe(process.stderr);
+    childProcess.on('close', () => {
+      resole();
+    })
+  })
+}
+
+const execCommand = (...args) => {
+  return new Promise((resolve, reject) => {
+    exec(...args, (err, stdout, stderr) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      console.log(stdout.replace('\n', ''));
+      // console.log(stderr);
       resolve();
-    });
-  });
-};
+    })
+  })
+}
+
 module.exports = {
-  commandSpawn,
+  spawn: spawnCommand,
+  exec: execCommand
 };
