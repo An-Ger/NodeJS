@@ -35,3 +35,5 @@ require首先查找文件X，然后是X.js，X.json,X.node
 2.如果没有查找到文件，会将X视作一个目录
 查找index.js,index.json,index.node
 如果都没有查找到就会报错，not found
+
+createServer本质就是new 一个 server 
